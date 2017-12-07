@@ -12,10 +12,26 @@ import (
 func CreatePoll(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
+	if c.Request.Body == nil {
+		c.JSON(400, gin.H{"message": "Request body is missing."})
+		return
+	}
+
 	var requestBody POSTPollsRequestBody
 	err := c.BindJSON(&requestBody)
 	if err != nil {
+		c.JSON(500, gin.H{"message": err})
 		log.Fatal(err)
+	}
+
+	if requestBody.Question == "" {
+		c.JSON(400, gin.H{"message": "Question is required."})
+		return
+	}
+
+	if len(requestBody.Choices) <= 1 {
+		c.JSON(400, gin.H{"message": "Please provide at least two choices."})
+		return
 	}
 
 	choices := make([]choice.Choice, len(requestBody.Choices))
