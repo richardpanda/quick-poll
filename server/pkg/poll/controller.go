@@ -36,7 +36,7 @@ func CreatePoll(c *gin.Context) {
 
 	choices := make([]choice.Choice, len(requestBody.Choices))
 	for i, text := range requestBody.Choices {
-		choices[i] = choice.Choice{ID: uuid.NewV4().String(), Text: text}
+		choices[i] = choice.New(text)
 	}
 
 	poll := Poll{ID: uuid.NewV4().String(), Question: requestBody.Question, Choices: choices}

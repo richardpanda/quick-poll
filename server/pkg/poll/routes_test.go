@@ -62,6 +62,7 @@ func TestPOSTPolls(t *testing.T) {
 	assert.Equal(t, 3, len(responseBody.Choices))
 	assert.True(t, responseBody.Choices[0].ID != "")
 	assert.Equal(t, "blue", responseBody.Choices[0].Text)
+	assert.Equal(t, 0, responseBody.Choices[0].NumVotes)
 }
 
 func TestPOSTPollsWithoutRequestBody(t *testing.T) {
