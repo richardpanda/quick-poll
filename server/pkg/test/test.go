@@ -5,10 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"github.com/richardpanda/quick-poll/server/pkg/middleware"
 )
 
 func DBConnection(t *testing.T) (*gorm.DB, func()) {
@@ -24,15 +22,4 @@ func DBConnection(t *testing.T) (*gorm.DB, func()) {
 	}
 
 	return db, func() { db.Close() }
-}
-
-func NewRouter(db *gorm.DB, addRoutes func(*gin.Engine)) *gin.Engine {
-	gin.SetMode(gin.TestMode)
-
-	r := gin.Default()
-	r.Use(middleware.SetDB(db))
-
-	addRoutes(r)
-
-	return r
 }

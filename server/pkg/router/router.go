@@ -15,3 +15,8 @@ func New(db *gorm.DB) *gin.Engine {
 
 	return r
 }
+
+func newTestRouter(db *gorm.DB) *gin.Engine {
+	gin.SetMode(gin.TestMode)
+	return New(db)
+}

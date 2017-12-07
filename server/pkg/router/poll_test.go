@@ -1,4 +1,4 @@
-package poll
+package router
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
+	"github.com/richardpanda/quick-poll/server/pkg/poll"
 	"github.com/richardpanda/quick-poll/server/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +21,7 @@ func createChoicesTable(db *gorm.DB) {
 }
 
 func createPollsTable(db *gorm.DB) {
-	db.CreateTable(&Poll{})
+	db.CreateTable(&poll.Poll{})
 }
 
 func dropChoicesTable(db *gorm.DB) {
@@ -39,20 +40,20 @@ func TestPOSTPolls(t *testing.T) {
 	defer dropPollsTable(db)
 	defer dropChoicesTable(db)
 
-	b, err := json.Marshal(POSTPollsRequestBody{
+	b, err := json.Marshal(poll.POSTPollsRequestBody{
 		Question: "Favorite color?",
 		Choices:  []string{"blue", "red", "yellow"},
 	})
 	assert.NoError(t, err)
 
-	router := test.NewRouter(db, AddRoutes)
+	router := newTestRouter(db)
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
-	var responseBody POSTPollsResponseBody
+	var responseBody poll.POSTPollsResponseBody
 	err = json.Unmarshal(resp.Body.Bytes(), &responseBody)
 
 	assert.NoError(t, err)
@@ -69,7 +70,7 @@ func TestPOSTPollsWithoutRequestBody(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	router := test.NewRouter(db, AddRoutes)
+	router := newTestRouter(db)
 	req, err := http.NewRequest("POST", "/v1/polls", nil)
 	assert.NoError(t, err)
 
@@ -88,12 +89,12 @@ func TestPOSTPollsWithoutQuestion(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(POSTPollsRequestBody{
+	b, err := json.Marshal(poll.POSTPollsRequestBody{
 		Choices: []string{"blue", "red", "yellow"},
 	})
 	assert.NoError(t, err)
 
-	router := test.NewRouter(db, AddRoutes)
+	router := newTestRouter(db)
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
@@ -112,12 +113,12 @@ func TestPOSTPollsWithoutChoices(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(POSTPollsRequestBody{
+	b, err := json.Marshal(poll.POSTPollsRequestBody{
 		Question: "Favorite color?",
 	})
 	assert.NoError(t, err)
 
-	router := test.NewRouter(db, AddRoutes)
+	router := newTestRouter(db)
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
@@ -136,13 +137,13 @@ func TestPOSTPollsWithOneChoice(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(POSTPollsRequestBody{
+	b, err := json.Marshal(poll.POSTPollsRequestBody{
 		Question: "Favorite color?",
 		Choices:  []string{"blue"},
 	})
 	assert.NoError(t, err)
 
-	router := test.NewRouter(db, AddRoutes)
+	router := newTestRouter(db)
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
