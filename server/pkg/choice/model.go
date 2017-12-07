@@ -16,6 +16,12 @@ type Choice struct {
 	DeletedAt *time.Time `json:"-"`
 }
 
+type POSTChoiceResponseBody struct {
+	ID       string `json:"id"`
+	Text     string `json:"text"`
+	NumVotes int    `json:"num_votes"`
+}
+
 func New(text string) Choice {
 	return Choice{
 		ID:       uuid.NewV4().String(),
