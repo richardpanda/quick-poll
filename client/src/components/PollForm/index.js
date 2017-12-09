@@ -49,6 +49,7 @@ class PollForm extends Component {
   async handleSubmit(event) {
     event.preventDefault();
 
+    const { history } = this.props;
     const { choices, question } = this.state;
     const validChoices = choices.filter(choice => choice !== "");
 
@@ -67,7 +68,7 @@ class PollForm extends Component {
       const payload = await response.json();
 
       if (response.ok) {
-        console.log(payload);
+        history.push(`/polls/${payload.id}`);
       } else {
         this.setState({ error: payload.message });
       }
@@ -82,7 +83,7 @@ class PollForm extends Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <Card className="poll-form">
-          <CardPrimary className="poll-form-title">
+          <CardPrimary>
             <CardTitle large>Create a Poll</CardTitle>
             <CardSubtitle className="poll-form-error">
               {error}

@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import PollForm from './components/PollForm';
+import VoteForm from './components/VoteForm';
 
 class App extends Component {
   render() {
@@ -12,6 +13,7 @@ class App extends Component {
         <main>
           <Switch>
             <Route exact path="/" component={PollForm} />
+            <Route path="/polls/:id" component={VoteForm} />
           </Switch>
         </main>
       </div>

@@ -1,12 +1,8 @@
-.poll-form {
+.vote-form {
     margin: 16px auto;
     max-width: 600px;
 }
 
-.poll-form-error {
+.vote-form-error {
     color: red;
-}
-
-.text-field {
-    width: 100%;
 }
