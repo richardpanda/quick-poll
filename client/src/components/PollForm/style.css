@@ -1,0 +1,16 @@
+.poll-form {
+    margin: 16px auto;
+    max-width: 600px;
+}
+
+.poll-form-error {
+    color: red;
+}
+
+.poll-form-title {
+    text-align: center;
+}
+
+.text-field {
+    width: 100%;
+}
