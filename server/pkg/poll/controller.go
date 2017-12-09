@@ -49,6 +49,10 @@ func CreatePoll(c *gin.Context) {
 	c.JSON(200, gin.H{"id": poll.ID, "question": requestBody.Question, "choices": choices})
 }
 
+func orderChoicesCreatedAt(db *gorm.DB) *gorm.DB {
+	return db.Order("choices.created_at ASC")
+}
+
 func ReadPoll(c *gin.Context) {
 	var (
 		db   = c.MustGet("db").(*gorm.DB)
@@ -56,7 +60,7 @@ func ReadPoll(c *gin.Context) {
 		poll = Poll{ID: id}
 	)
 
-	err := db.Preload("Choices").Find(&poll).Error
+	err := db.Preload("Choices", orderChoicesCreatedAt).Find(&poll).Error
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Invalid poll ID."})
 		return
