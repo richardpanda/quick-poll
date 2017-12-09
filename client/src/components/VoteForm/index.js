@@ -56,7 +56,9 @@ class VoteForm extends Component {
   async handleSubmit(event) {
     event.preventDefault();
     
+    const { history, match } = this.props;
     const { choices, vote } = this.state;
+    const { id: pollId } = match.params;
     if (vote === -1) {
       this.setState({ error: 'Please select a choice.' });
       return;
@@ -65,13 +67,13 @@ class VoteForm extends Component {
 
     try {
       const opts = { method: 'POST' };
-      const id = choices[vote].id;
-      const response = await fetch(`/v1/choices/${id}`, opts);
+      const { id: choiceId } = choices[vote];
+      const response = await fetch(`/v1/choices/${choiceId}`, opts);
       const payload = await response.json();
 
       if (response.ok) {
         this.setState({ isLoading: false });
-        console.log(payload);
+        history.push(`/polls/${pollId}/results`);
       } else {
         this.setState({ error: payload.message, isLoading: false });
       }

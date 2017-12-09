@@ -1,0 +1,17 @@
+.poll-results {
+    margin: 16px auto;
+    max-width: 600px;
+}
+
+.poll-results-bar {
+    background-color: var(--mdc-theme-secondary-light);
+}
+
+.poll-results-percent {
+    margin-left: 4px;
+}
+
+.poll-results-row {
+    display: flex;
+    justify-content: space-between;
+}
