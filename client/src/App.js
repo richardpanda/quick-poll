@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import PollForm from './components/PollForm';
@@ -8,7 +9,11 @@ class App extends Component {
     return (
       <div className="App">
         <Navbar />
-        <PollForm />
+        <main>
+          <Switch>
+            <Route exact path="/" component={PollForm} />
+          </Switch>
+        </main>
       </div>
     );
   }
