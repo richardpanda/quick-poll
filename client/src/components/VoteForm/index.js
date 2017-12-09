@@ -7,6 +7,7 @@ import {
   CardSubtitle,
   CardSupportingText,
   CardTitle,
+  LinearProgress,
   Radio,
 } from 'rmwc';
 
@@ -18,6 +19,7 @@ class VoteForm extends Component {
     this.state = {
       choices: [],
       error: '',
+      isLoading: true,
       question: '',
       vote: -1,
     };
@@ -35,12 +37,12 @@ class VoteForm extends Component {
 
       if (response.ok) {
         const { choices, question } = payload;
-        this.setState({ choices, question });
+        this.setState({ choices, isLoading: false, question });
       } else {
-        this.setState({ error: payload.message });
+        this.setState({ error: payload.message, isloading: false });
       }
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ error: e, isLoading: false });
     }
   }
 
@@ -59,7 +61,7 @@ class VoteForm extends Component {
       this.setState({ error: 'Please select a choice.' });
       return;
     }
-    this.setState({ error: '' });
+    this.setState({ error: '', isLoading: true });
 
     try {
       const opts = { method: 'POST' };
@@ -68,17 +70,22 @@ class VoteForm extends Component {
       const payload = await response.json();
 
       if (response.ok) {
+        this.setState({ isLoading: false });
         console.log(payload);
       } else {
-        this.setState({ error: payload.message });
+        this.setState({ error: payload.message, isLoading: false });
       }
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ error: e, isLoading: false });
     }
   }
 
   render() {
-    const { choices, error, question, vote } = this.state;
+    const { choices, error, isLoading, question, vote } = this.state;
+
+    if (isLoading) {
+      return <LinearProgress className="loading" determinate={false} />;
+    }
 
     return (
       <form onSubmit={this.handleSubmit}>

@@ -7,6 +7,7 @@ import {
   CardSubtitle,
   CardSupportingText,
   CardTitle,
+  LinearProgress,
   TextField,
 } from 'rmwc';
 
@@ -18,6 +19,7 @@ class PollForm extends Component {
     this.state = {
       choices: ['', ''],
       error: '',
+      isLoading: false,
       question: '',
     };
     this.handleChoiceChange = this.handleChoiceChange.bind(this);
@@ -57,7 +59,7 @@ class PollForm extends Component {
       this.setState({ error: 'Please provide at least two choices.' });
       return;
     }
-    this.setState({ error: '' });
+    this.setState({ error: '', isLoading: true });
 
     try {
       const opts = {
@@ -68,51 +70,57 @@ class PollForm extends Component {
       const payload = await response.json();
 
       if (response.ok) {
+        this.setState({ isLoading: false });
         history.push(`/polls/${payload.id}`);
       } else {
-        this.setState({ error: payload.message });
+        this.setState({ error: payload.message, isLoading: false });
       }
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ error: e, isLoading: false });
     }
   }
 
   render() {
-    const { choices, error } = this.state;
+    const { choices, error, isLoading } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <Card className="poll-form">
-          <CardPrimary>
-            <CardTitle large>Create a Poll</CardTitle>
-            <CardSubtitle className="poll-form-error">
-              {error}
-            </CardSubtitle>
-          </CardPrimary>
-          <CardSupportingText>
-            <div>
-              <TextField
-                className="text-field"
-                label="Question"
-                onChange={this.handleQuestionChange}
-                required
-              />
-            </div>
-            {choices.map((choice, i) => (
-              <div key={i}>
+      <div>
+        {isLoading
+          && <LinearProgress className="loading" determinate={false} />
+        }
+        <form onSubmit={this.handleSubmit}>
+          <Card className="poll-form">
+            <CardPrimary>
+              <CardTitle large>Create a Poll</CardTitle>
+              <CardSubtitle className="poll-form-error">
+                {error}
+              </CardSubtitle>
+            </CardPrimary>
+            <CardSupportingText>
+              <div>
                 <TextField
                   className="text-field"
-                  label="Choice"
-                  onChange={this.handleChoiceChange(i)}
+                  label="Question"
+                  onChange={this.handleQuestionChange}
+                  required
                 />
               </div>
-            ))}
-          </CardSupportingText>
-          <CardActions>
-            <CardAction unelevated type="submit">Submit</CardAction>
-          </CardActions>
-        </Card>
-      </form>
+              {choices.map((choice, i) => (
+                <div key={i}>
+                  <TextField
+                    className="text-field"
+                    label="Choice"
+                    onChange={this.handleChoiceChange(i)}
+                  />
+                </div>
+              ))}
+            </CardSupportingText>
+            <CardActions>
+              <CardAction unelevated type="submit">Submit</CardAction>
+            </CardActions>
+          </Card>
+        </form>
+      </div>
     );
   }
 }

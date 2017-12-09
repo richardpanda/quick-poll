@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import PollForm from './components/PollForm';
 import VoteForm from './components/VoteForm';
 
+import './style.css';
+
 class App extends Component {
   render() {
     return (
