@@ -9,7 +9,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func CreatePoll(c *gin.Context) {
+func Create(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	if c.Request.Body == nil {
@@ -53,7 +53,7 @@ func orderChoicesCreatedAt(db *gorm.DB) *gorm.DB {
 	return db.Order("choices.created_at ASC")
 }
 
-func ReadPoll(c *gin.Context) {
+func ReadOne(c *gin.Context) {
 	var (
 		db   = c.MustGet("db").(*gorm.DB)
 		id   = c.Params.ByName("id")

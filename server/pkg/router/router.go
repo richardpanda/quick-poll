@@ -11,10 +11,9 @@ import (
 func New(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.SetDB(db))
-
-	choice.AddRoutes(r)
-	poll.AddRoutes(r)
-
+	r.POST("/v1/choices/:id", choice.IncrementNumVotes)
+	r.GET("/v1/polls/:id", poll.ReadOne)
+	r.POST("/v1/polls", poll.Create)
 	return r
 }
 
