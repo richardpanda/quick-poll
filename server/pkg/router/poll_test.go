@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/richardpanda/quick-poll/server/pkg/ws"
+
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
@@ -39,7 +41,7 @@ func TestGetPoll(t *testing.T) {
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	endpoint := fmt.Sprintf("/v1/polls/%s", p.ID)
 	req, err := http.NewRequest("GET", endpoint, nil)
 	assert.NoError(t, err)
@@ -82,7 +84,7 @@ func TestGetPollWithInvalidID(t *testing.T) {
 	assert.NoError(t, err)
 
 	invalidID := uuid.NewV4()
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	endpoint := fmt.Sprintf("/v1/polls/%s", invalidID)
 	req, err := http.NewRequest("GET", endpoint, nil)
 	assert.NoError(t, err)
@@ -112,7 +114,7 @@ func TestPOSTPolls(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
@@ -136,7 +138,7 @@ func TestPOSTPollsWithoutRequestBody(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", nil)
 	assert.NoError(t, err)
 
@@ -160,7 +162,7 @@ func TestPOSTPollsWithoutQuestion(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
@@ -184,7 +186,7 @@ func TestPOSTPollsWithoutChoices(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 
@@ -209,7 +211,7 @@ func TestPOSTPollsWithOneChoice(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 

@@ -7,6 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/richardpanda/quick-poll/server/pkg/ws"
+
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -40,7 +42,7 @@ func TestPOSTChoice(t *testing.T) {
 	assert.NoError(t, err)
 
 	choiceID := poll.Choices[0].ID
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	endpoint := fmt.Sprintf("/v1/choices/%s", choiceID)
 	req, err := http.NewRequest("POST", endpoint, nil)
 	assert.NoError(t, err)
@@ -80,7 +82,7 @@ func TestPOSTChoiceWithInvalidID(t *testing.T) {
 	assert.NoError(t, err)
 
 	invalidID := uuid.NewV4()
-	router := NewTestRouter(db)
+	router := NewTestRouter(db, ws.NewConn())
 	endpoint := fmt.Sprintf("/v1/choices/%s", invalidID)
 	req, err := http.NewRequest("POST", endpoint, nil)
 	assert.NoError(t, err)
