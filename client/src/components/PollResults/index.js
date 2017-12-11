@@ -14,10 +14,14 @@ class PollResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      choices: [],
+      choices: {
+        byId: {},
+        allIds: [],
+      },
       error: '',
       isLoading: false,
       question: '',
+      ws: null,
     };
   }
 
@@ -33,7 +37,27 @@ class PollResults extends Component {
 
       if (response.ok) {
         const { choices, question } = payload;
-        this.setState({ choices, isLoading: false, question });
+        const byId = choices.reduce((acc, { id, text, num_votes }) => (
+          { ...acc, [id]: { id, text, num_votes }}
+        ), {});
+        const allIds = choices.map(choice => choice.id);
+
+        const ws = new WebSocket(`ws://localhost:8080/v1/ws?poll_id=${id}`);
+        ws.onmessage = ({ data }) => {
+          const { id, num_votes } = JSON.parse(data);
+          const { choices } = this.state;
+          if (choices.byId[id].num_votes < num_votes) {
+            choices.byId[id].num_votes = num_votes;
+            this.setState({ choices });
+          }
+        };
+
+        this.setState({
+          choices: { byId, allIds },
+          isLoading: false,
+          question,
+          ws,
+        });
       } else {
         this.setState({ error: payload.message, isloading: false });
       }
@@ -42,10 +66,14 @@ class PollResults extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.state.ws.close();
+  }
+
   render() {
     const { choices, error, isLoading, question } = this.state;
-    const sum = choices.reduce((acc, choice) => acc + choice.num_votes, 0);
-    const sortedChoices = [...choices];
+    const sum = choices.allIds.reduce((acc, id) => acc + choices.byId[id].num_votes, 0);
+    const sortedChoices = choices.allIds.map(id => choices.byId[id]);
     sortedChoices.sort((c1, c2) => c2.num_votes - c1.num_votes);
 
     if (isLoading) {
