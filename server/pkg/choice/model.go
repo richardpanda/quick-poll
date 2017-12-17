@@ -16,7 +16,7 @@ type Choice struct {
 	DeletedAt *time.Time `json:"-"`
 }
 
-type POSTChoiceResponseBody struct {
+type PostChoiceResponseBody struct {
 	ID       string `json:"id"`
 	Text     string `json:"text"`
 	NumVotes int    `json:"num_votes"`

@@ -17,7 +17,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	var requestBody POSTPollsRequestBody
+	var requestBody PostPollsRequestBody
 	err := c.BindJSON(&requestBody)
 	if err != nil {
 		c.JSON(500, gin.H{"message": err})

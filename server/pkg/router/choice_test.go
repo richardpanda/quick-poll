@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPOSTChoice(t *testing.T) {
+func TestPostChoice(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 	test.CreatePollsTable(db)
@@ -56,7 +56,7 @@ func TestPOSTChoice(t *testing.T) {
 	assert.NoError(t, err)
 	defer resp.Body.Close()
 
-	var responseBody choice.POSTChoiceResponseBody
+	var responseBody choice.PostChoiceResponseBody
 	err = json.NewDecoder(resp.Body).Decode(&responseBody)
 	assert.NoError(t, err)
 
@@ -72,7 +72,7 @@ func TestPOSTChoice(t *testing.T) {
 	assert.Equal(t, 1, cu.NumVotes)
 }
 
-func TestPOSTChoiceWithInvalidID(t *testing.T) {
+func TestPostChoiceWithInvalidID(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 	test.CreatePollsTable(db)

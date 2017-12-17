@@ -16,20 +16,20 @@ type Poll struct {
 	DeletedAt *time.Time      `json:"-"`
 }
 
-type GETPollResponseBody struct {
+type GetPollResponseBody struct {
 	ID       string          `json:"id"`
 	Question string          `json:"question"`
 	Choices  []choice.Choice `json:"choices"`
 	CheckIP  bool            `json:"check_ip"`
 }
 
-type POSTPollsRequestBody struct {
+type PostPollsRequestBody struct {
 	Question string   `json:"question"`
 	Choices  []string `json:"choices"`
 	CheckIP  bool     `json:"check_ip"`
 }
 
-type POSTPollsResponseBody struct {
+type PostPollsResponseBody struct {
 	ID       string          `json:"id"`
 	Question string          `json:"question"`
 	Choices  []choice.Choice `json:"choices"`

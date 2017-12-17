@@ -49,7 +49,7 @@ func TestGetPoll(t *testing.T) {
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
-	var responseBody poll.GETPollResponseBody
+	var responseBody poll.GetPollResponseBody
 	err = json.Unmarshal(resp.Body.Bytes(), &responseBody)
 
 	assert.NoError(t, err)
@@ -102,7 +102,7 @@ func TestGetPollWithInvalidID(t *testing.T) {
 	assert.Equal(t, "Invalid poll ID.", responseBody.Message)
 }
 
-func TestPOSTPolls(t *testing.T) {
+func TestPostPolls(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 	test.CreatePollsTable(db)
@@ -110,7 +110,7 @@ func TestPOSTPolls(t *testing.T) {
 	defer test.DropPollsTable(db)
 	defer test.DropChoicesTable(db)
 
-	b, err := json.Marshal(poll.POSTPollsRequestBody{
+	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
 		Choices:  []string{"blue", "red", "yellow"},
 		CheckIP:  true,
@@ -124,7 +124,7 @@ func TestPOSTPolls(t *testing.T) {
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
-	var responseBody poll.POSTPollsResponseBody
+	var responseBody poll.PostPollsResponseBody
 	err = json.Unmarshal(resp.Body.Bytes(), &responseBody)
 
 	assert.NoError(t, err)
@@ -138,7 +138,7 @@ func TestPOSTPolls(t *testing.T) {
 	assert.True(t, responseBody.CheckIP)
 }
 
-func TestPOSTPollsWithoutRequestBody(t *testing.T) {
+func TestPostPollsWithoutRequestBody(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
@@ -157,11 +157,11 @@ func TestPOSTPollsWithoutRequestBody(t *testing.T) {
 	assert.Equal(t, "Request body is missing.", responseBody.Message)
 }
 
-func TestPOSTPollsWithoutQuestion(t *testing.T) {
+func TestPostPollsWithoutQuestion(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(poll.POSTPollsRequestBody{
+	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Choices: []string{"blue", "red", "yellow"},
 	})
 	assert.NoError(t, err)
@@ -181,11 +181,11 @@ func TestPOSTPollsWithoutQuestion(t *testing.T) {
 	assert.Equal(t, "Question is required.", responseBody.Message)
 }
 
-func TestPOSTPollsWithoutChoices(t *testing.T) {
+func TestPostPollsWithoutChoices(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(poll.POSTPollsRequestBody{
+	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
 	})
 	assert.NoError(t, err)
@@ -205,11 +205,11 @@ func TestPOSTPollsWithoutChoices(t *testing.T) {
 	assert.Equal(t, "Please provide at least two choices.", responseBody.Message)
 }
 
-func TestPOSTPollsWithOneChoice(t *testing.T) {
+func TestPostPollsWithOneChoice(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 
-	b, err := json.Marshal(poll.POSTPollsRequestBody{
+	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
 		Choices:  []string{"blue"},
 	})
