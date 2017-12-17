@@ -39,14 +39,24 @@ func Create(c *gin.Context) {
 		choices[i] = choice.New(text)
 	}
 
-	poll := Poll{ID: uuid.NewV4().String(), Question: requestBody.Question, Choices: choices}
+	poll := Poll{
+		ID:       uuid.NewV4().String(),
+		Question: requestBody.Question,
+		Choices:  choices,
+		CheckIP:  requestBody.CheckIP,
+	}
 	newDB := db.Create(&poll)
 	if newDB.Error != nil {
 		c.JSON(400, gin.H{"message": newDB.Error})
 		return
 	}
 
-	c.JSON(200, gin.H{"id": poll.ID, "question": requestBody.Question, "choices": choices})
+	c.JSON(200, gin.H{
+		"id":       poll.ID,
+		"question": requestBody.Question,
+		"choices":  choices,
+		"check_ip": requestBody.CheckIP,
+	})
 }
 
 func orderChoicesCreatedAt(db *gorm.DB) *gorm.DB {

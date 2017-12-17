@@ -60,6 +60,7 @@ func TestGetPoll(t *testing.T) {
 	assert.True(t, responseBody.Choices[0].ID != "")
 	assert.Equal(t, "blue", responseBody.Choices[0].Text)
 	assert.Equal(t, 0, responseBody.Choices[0].NumVotes)
+	assert.False(t, responseBody.CheckIP)
 }
 
 func TestGetPollWithInvalidID(t *testing.T) {
@@ -78,6 +79,7 @@ func TestGetPollWithInvalidID(t *testing.T) {
 			choice.New("red"),
 			choice.New("yellow"),
 		},
+		CheckIP: true,
 	}
 
 	err := db.Create(&p).Error
@@ -111,6 +113,7 @@ func TestPOSTPolls(t *testing.T) {
 	b, err := json.Marshal(poll.POSTPollsRequestBody{
 		Question: "Favorite color?",
 		Choices:  []string{"blue", "red", "yellow"},
+		CheckIP:  true,
 	})
 	assert.NoError(t, err)
 
@@ -132,6 +135,7 @@ func TestPOSTPolls(t *testing.T) {
 	assert.True(t, responseBody.Choices[0].ID != "")
 	assert.Equal(t, "blue", responseBody.Choices[0].Text)
 	assert.Equal(t, 0, responseBody.Choices[0].NumVotes)
+	assert.True(t, responseBody.CheckIP)
 }
 
 func TestPOSTPollsWithoutRequestBody(t *testing.T) {
