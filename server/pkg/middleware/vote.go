@@ -12,7 +12,7 @@ func CheckDuplicateVote() gin.HandlerFunc {
 		var (
 			db          = c.MustGet("db").(*gorm.DB)
 			currentPoll = c.MustGet("currentPoll").(poll.Poll)
-			pollID      = c.Params.ByName("pollID")
+			pollID      = c.Params.ByName("id")
 		)
 
 		c.Set("checkIP", false)

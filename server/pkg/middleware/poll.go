@@ -10,7 +10,7 @@ func ValidatePollID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			db          = c.MustGet("db").(*gorm.DB)
-			pollID      = c.Params.ByName("pollID")
+			pollID      = c.Params.ByName("id")
 			currentPoll = poll.Poll{ID: pollID}
 		)
 

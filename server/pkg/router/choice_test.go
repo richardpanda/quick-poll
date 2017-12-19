@@ -47,7 +47,7 @@ func TestPostChoice(t *testing.T) {
 	router := NewTestRouter(db, ws.NewConn())
 	server := httptest.NewServer(router)
 
-	wsURL := fmt.Sprintf("ws%s/v1/ws?poll_id=%s", strings.TrimPrefix(server.URL, "http"), p.ID)
+	wsURL := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(wsURL, nil)
 	assert.NoError(t, err)
@@ -103,7 +103,7 @@ func TestPostChoiceTwiceToSamePoll(t *testing.T) {
 	router := NewTestRouter(db, ws.NewConn())
 	server := httptest.NewServer(router)
 
-	wsURL := fmt.Sprintf("ws%s/v1/ws?poll_id=%s", strings.TrimPrefix(server.URL, "http"), p.ID)
+	wsURL := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(wsURL, nil)
 	assert.NoError(t, err)

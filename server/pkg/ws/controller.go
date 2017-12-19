@@ -17,12 +17,7 @@ var wsupgrader = websocket.Upgrader{
 
 func OpenConnection(wsConn *Conn) func(*gin.Context) {
 	return func(c *gin.Context) {
-		pollID := c.Query("poll_id")
-
-		if pollID == "" {
-			c.JSON(400, gin.H{"message": "Poll ID is required."})
-			return
-		}
+		id := c.Params.ByName("id")
 
 		conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -31,15 +26,15 @@ func OpenConnection(wsConn *Conn) func(*gin.Context) {
 		defer conn.Close()
 		addrString := conn.RemoteAddr().String()
 
-		if wsConn.Table[pollID] == nil {
-			wsConn.Table[pollID] = make(map[string]*websocket.Conn)
+		if wsConn.Table[id] == nil {
+			wsConn.Table[id] = make(map[string]*websocket.Conn)
 		}
-		wsConn.Table[pollID][addrString] = conn
+		wsConn.Table[id][addrString] = conn
 
 		for {
 			_, _, err := conn.ReadMessage()
 			if err != nil {
-				delete(wsConn.Table[pollID], addrString)
+				delete(wsConn.Table[id], addrString)
 				if flag.Lookup("test.v") != nil {
 					wsConn.Done <- true
 				}

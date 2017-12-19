@@ -13,7 +13,7 @@ func IncrementNumVotes(wsConn *ws.Conn) func(*gin.Context) {
 		var (
 			db            = c.MustGet("db").(*gorm.DB)
 			checkIP       = c.MustGet("checkIP").(bool)
-			pollID        = c.Params.ByName("pollID")
+			pollID        = c.Params.ByName("id")
 			currentChoice = c.MustGet("currentChoice").(Choice)
 			choiceID      = c.Params.ByName("choiceID")
 			tx            = db.Begin()
