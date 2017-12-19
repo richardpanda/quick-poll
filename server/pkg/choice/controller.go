@@ -3,33 +3,43 @@ package choice
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/richardpanda/quick-poll/server/pkg/vote"
 	"github.com/richardpanda/quick-poll/server/pkg/ws"
+	uuid "github.com/satori/go.uuid"
 )
 
 func IncrementNumVotes(wsConn *ws.Conn) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var (
-			db     = c.MustGet("db").(*gorm.DB)
-			id     = c.Params.ByName("id")
-			tx     = db.Begin()
-			choice Choice
+			db            = c.MustGet("db").(*gorm.DB)
+			checkIP       = c.MustGet("checkIP").(bool)
+			pollID        = c.Params.ByName("pollID")
+			currentChoice = c.MustGet("currentChoice").(Choice)
+			choiceID      = c.Params.ByName("choiceID")
+			tx            = db.Begin()
 		)
 
-		if err := tx.Where(&Choice{ID: id}).First(&choice).Error; err != nil {
-			tx.Rollback()
-			c.JSON(400, gin.H{"message": "Invalid choice ID."})
-			return
-		}
-
-		if err := tx.Model(&choice).Update("num_votes", choice.NumVotes+1).Error; err != nil {
+		if err := tx.Model(&currentChoice).Update("num_votes", currentChoice.NumVotes+1).Error; err != nil {
 			tx.Rollback()
 			c.JSON(400, gin.H{"message": err})
 			return
 		}
 
-		tx.Commit()
+		if checkIP {
+			v := vote.Vote{
+				ID:        uuid.NewV4().String(),
+				PollID:    pollID,
+				IPAddress: c.ClientIP(),
+			}
+			if err := tx.Create(&v).Error; err != nil {
+				tx.Rollback()
+				c.JSON(400, gin.H{"message": err})
+				return
+			}
+		}
 
-		wsConn.BroadcastUpdate(choice.PollID, choice.ID, choice.NumVotes)
-		c.JSON(200, gin.H{"id": id, "text": choice.Text, "num_votes": choice.NumVotes})
+		tx.Commit()
+		wsConn.BroadcastUpdate(pollID, currentChoice.ID, currentChoice.NumVotes)
+		c.JSON(200, gin.H{"id": choiceID, "text": currentChoice.Text, "num_votes": currentChoice.NumVotes})
 	}
 }

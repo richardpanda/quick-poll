@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/poll"
+	"github.com/richardpanda/quick-poll/server/pkg/vote"
 )
 
 func CreateChoicesTable(db *gorm.DB) {
@@ -17,6 +18,10 @@ func CreateChoicesTable(db *gorm.DB) {
 
 func CreatePollsTable(db *gorm.DB) {
 	db.CreateTable(&poll.Poll{})
+}
+
+func CreateVotesTable(db *gorm.DB) {
+	db.CreateTable(&vote.Vote{})
 }
 
 func DBConnection(t *testing.T) (*gorm.DB, func()) {
@@ -40,4 +45,8 @@ func DropChoicesTable(db *gorm.DB) {
 
 func DropPollsTable(db *gorm.DB) {
 	db.DropTableIfExists("polls")
+}
+
+func DropVotesTable(db *gorm.DB) {
+	db.DropTableIfExists("votes")
 }

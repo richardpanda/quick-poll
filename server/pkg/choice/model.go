@@ -7,10 +7,11 @@ import (
 )
 
 type Choice struct {
-	ID        string     `sql:"type:uuid;primary_key" json:"id"`
-	PollID    string     `gorm:"type:uuid REFERENCES polls(id)" json:"-"`
-	Text      string     `gorm:"type:varchar(280)" json:"text"`
-	NumVotes  int        `json:"num_votes"`
+	ID       string `json:"id" sql:"type:uuid;primary_key"`
+	PollID   string `json:"-" gorm:"type:uuid REFERENCES polls(id)"`
+	Text     string `json:"text" gorm:"type:varchar(280)"`
+	NumVotes int    `json:"num_votes"`
+	// Vote      []vote.Vote `json:"votes"`
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-"`

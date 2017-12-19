@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/richardpanda/quick-poll/server/pkg/vote"
 	"github.com/richardpanda/quick-poll/server/pkg/ws"
 
 	"github.com/jinzhu/gorm"
@@ -27,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	db.AutoMigrate(&poll.Poll{}, &choice.Choice{})
+	db.AutoMigrate(&poll.Poll{}, &choice.Choice{}, &vote.Vote{})
 
 	r := router.New(db, conn)
 	r.Run(":8080")

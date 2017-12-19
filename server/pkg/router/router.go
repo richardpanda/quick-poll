@@ -12,7 +12,13 @@ import (
 func New(db *gorm.DB, conn *ws.Conn) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.SetDB(db))
-	r.POST("/v1/choices/:id", choice.IncrementNumVotes(conn))
+	r.POST(
+		"/v1/polls/:pollID/choices/:choiceID",
+		middleware.ValidatePollID(),
+		middleware.ValidateChoiceID(),
+		middleware.CheckDuplicateVote(),
+		choice.IncrementNumVotes(conn),
+	)
 	r.GET("/v1/polls/:id", poll.ReadOne)
 	r.POST("/v1/polls", poll.Create)
 	r.GET("/v1/ws", ws.OpenConnection(conn))

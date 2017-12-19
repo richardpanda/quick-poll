@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
+	"github.com/richardpanda/quick-poll/server/pkg/vote"
 )
 
 type Poll struct {
@@ -11,6 +12,7 @@ type Poll struct {
 	Question  string          `json:"question" gorm:"type:varchar(280)"`
 	Choices   []choice.Choice `json:"choices"`
 	CheckIP   bool            `json:"check_ip" gorm:"type:boolean" sql:"default:false"`
+	Votes     []vote.Vote     `json:"votes"`
 	CreatedAt time.Time       `json:"-"`
 	UpdatedAt time.Time       `json:"-"`
 	DeletedAt *time.Time      `json:"-"`

@@ -25,10 +25,12 @@ func TestPostChoice(t *testing.T) {
 	defer close()
 	test.CreatePollsTable(db)
 	test.CreateChoicesTable(db)
+	test.CreateVotesTable(db)
 	defer test.DropPollsTable(db)
 	defer test.DropChoicesTable(db)
+	defer test.DropVotesTable(db)
 
-	poll := poll.Poll{
+	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
 		Question: "Favorite color?",
 		Choices: []choice.Choice{
@@ -38,20 +40,20 @@ func TestPostChoice(t *testing.T) {
 		},
 	}
 
-	err := db.Create(&poll).Error
+	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
-	choiceID := poll.Choices[0].ID
+	choiceID := p.Choices[0].ID
 	router := NewTestRouter(db, ws.NewConn())
 	server := httptest.NewServer(router)
 
-	wsURL := fmt.Sprintf("ws%s/v1/ws?poll_id=%s", strings.TrimPrefix(server.URL, "http"), poll.ID)
+	wsURL := fmt.Sprintf("ws%s/v1/ws?poll_id=%s", strings.TrimPrefix(server.URL, "http"), p.ID)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(wsURL, nil)
 	assert.NoError(t, err)
 	defer conn.Close()
 
-	choiceURL := fmt.Sprintf("%s/v1/choices/%s", server.URL, choiceID)
+	choiceURL := fmt.Sprintf("%s/v1/polls/%s/choices/%s", server.URL, p.ID, choiceID)
 	resp, err := http.Post(choiceURL, "", nil)
 	assert.NoError(t, err)
 	defer resp.Body.Close()
@@ -72,15 +74,85 @@ func TestPostChoice(t *testing.T) {
 	assert.Equal(t, 1, cu.NumVotes)
 }
 
+func TestPostChoiceTwiceToSamePoll(t *testing.T) {
+	db, close := test.DBConnection(t)
+	defer close()
+	test.CreatePollsTable(db)
+	test.CreateChoicesTable(db)
+	test.CreateVotesTable(db)
+	defer test.DropPollsTable(db)
+	defer test.DropChoicesTable(db)
+	defer test.DropVotesTable(db)
+
+	p := poll.Poll{
+		ID:       uuid.NewV4().String(),
+		Question: "Favorite color?",
+		Choices: []choice.Choice{
+			choice.New("blue"),
+			choice.New("red"),
+			choice.New("yellow"),
+		},
+		CheckIP: true,
+	}
+
+	err := db.Create(&p).Error
+	assert.NoError(t, err)
+
+	firstChoiceID := p.Choices[0].ID
+	secondChoiceID := p.Choices[1].ID
+	router := NewTestRouter(db, ws.NewConn())
+	server := httptest.NewServer(router)
+
+	wsURL := fmt.Sprintf("ws%s/v1/ws?poll_id=%s", strings.TrimPrefix(server.URL, "http"), p.ID)
+	d := websocket.DefaultDialer
+	conn, _, err := d.Dial(wsURL, nil)
+	assert.NoError(t, err)
+	defer conn.Close()
+
+	choiceURL := fmt.Sprintf("%s/v1/polls/%s/choices/%s", server.URL, p.ID, firstChoiceID)
+	resp, err := http.Post(choiceURL, "", nil)
+	assert.NoError(t, err)
+	defer resp.Body.Close()
+
+	var responseBody choice.PostChoiceResponseBody
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	assert.NoError(t, err)
+
+	cu := ws.ChoiceUpdate{}
+	err = conn.ReadJSON(&cu)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode)
+	assert.Equal(t, firstChoiceID, responseBody.ID)
+	assert.Equal(t, "blue", responseBody.Text)
+	assert.Equal(t, 1, responseBody.NumVotes)
+	assert.Equal(t, firstChoiceID, cu.ID)
+	assert.Equal(t, 1, cu.NumVotes)
+
+	choiceURL = fmt.Sprintf("%s/v1/polls/%s/choices/%s", server.URL, p.ID, secondChoiceID)
+	resp, err = http.Post(choiceURL, "", nil)
+	assert.NoError(t, err)
+	defer resp.Body.Close()
+
+	var errorResponseBody httperror.ResponseBody
+	err = json.NewDecoder(resp.Body).Decode(&errorResponseBody)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 400, resp.StatusCode)
+	assert.Equal(t, "You have already voted on this poll.", errorResponseBody.Message)
+}
+
 func TestPostChoiceWithInvalidID(t *testing.T) {
 	db, close := test.DBConnection(t)
 	defer close()
 	test.CreatePollsTable(db)
 	test.CreateChoicesTable(db)
+	test.CreateVotesTable(db)
 	defer test.DropPollsTable(db)
 	defer test.DropChoicesTable(db)
+	defer test.DropVotesTable(db)
 
-	poll := poll.Poll{
+	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
 		Question: "Favorite color?",
 		Choices: []choice.Choice{
@@ -90,12 +162,12 @@ func TestPostChoiceWithInvalidID(t *testing.T) {
 		},
 	}
 
-	err := db.Create(&poll).Error
+	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
 	invalidID := uuid.NewV4()
 	router := NewTestRouter(db, ws.NewConn())
-	endpoint := fmt.Sprintf("/v1/choices/%s", invalidID)
+	endpoint := fmt.Sprintf("/v1/polls/%s/choices/%s", p.ID, invalidID)
 	req, err := http.NewRequest("POST", endpoint, nil)
 	assert.NoError(t, err)
 
