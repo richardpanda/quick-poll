@@ -7,6 +7,7 @@ import {
   CardSubtitle,
   CardSupportingText,
   CardTitle,
+  Checkbox,
   LinearProgress,
   TextField,
 } from 'rmwc';
@@ -17,6 +18,7 @@ class PollForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      checkIP: false,
       choices: ['', ''],
       error: '',
       isLoading: false,
@@ -24,6 +26,7 @@ class PollForm extends Component {
     };
     this.handleChoiceChange = this.handleChoiceChange.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    this.handleCheckIPClick = this.handleCheckIPClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -52,7 +55,7 @@ class PollForm extends Component {
     event.preventDefault();
 
     const { history } = this.props;
-    const { choices, question } = this.state;
+    const { choices, checkIP, question } = this.state;
     const validChoices = choices.filter(choice => choice !== "");
 
     if (validChoices.length < 2) {
@@ -64,7 +67,7 @@ class PollForm extends Component {
     try {
       const opts = {
         method: 'POST',
-        body: JSON.stringify({ question, choices: validChoices }),
+        body: JSON.stringify({ question, choices: validChoices, check_ip: checkIP }),
       };
       const response = await fetch('/v1/polls', opts);
       const payload = await response.json();
@@ -78,6 +81,11 @@ class PollForm extends Component {
     } catch (e) {
       this.setState({ error: e, isLoading: false });
     }
+  }
+
+  handleCheckIPClick() {
+    const { checkIP } = this.state;
+    this.setState({ checkIP: !checkIP });
   }
 
   render() {
@@ -114,6 +122,7 @@ class PollForm extends Component {
                   />
                 </div>
               ))}
+              <Checkbox onClick={this.handleCheckIPClick}>IP Duplication Checking</Checkbox>
             </CardSupportingText>
             <CardActions>
               <CardAction raised type="submit">Submit</CardAction>
