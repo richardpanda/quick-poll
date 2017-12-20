@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Card,
   CardAction,
@@ -83,6 +84,8 @@ class VoteForm extends Component {
   }
 
   render() {
+    const { match } = this.props;
+    const { id } = match.params;
     const { choices, error, isLoading, question, vote } = this.state;
 
     if (isLoading) {
@@ -113,6 +116,20 @@ class VoteForm extends Component {
           </CardSupportingText>
           <CardActions>
             <CardAction raised type="submit">Vote</CardAction>
+            <Link to={`/polls/${id}/results`}>
+              <CardAction
+                raised
+                theme={['secondary-bg', 'text-primary-on-secondary']}
+              >
+                Results
+              </CardAction>
+            </Link>
+            {/* <CardAction
+              raised
+              theme={['secondary-bg', 'text-primary-on-secondary']}
+            >
+              Results
+            </CardAction> */}
           </CardActions>
         </Card>
       </form>
