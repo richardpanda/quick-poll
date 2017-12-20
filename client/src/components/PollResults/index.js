@@ -42,7 +42,7 @@ class PollResults extends Component {
         ), {});
         const allIds = choices.map(choice => choice.id);
 
-        const ws = new WebSocket(`ws://localhost:8080/v1/ws?poll_id=${id}`);
+        const ws = new WebSocket(`ws://localhost:8080/v1/polls/${id}/ws`);
         ws.onmessage = ({ data }) => {
           const { id, num_votes } = JSON.parse(data);
           const { choices } = this.state;

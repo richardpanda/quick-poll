@@ -68,7 +68,7 @@ class VoteForm extends Component {
     try {
       const opts = { method: 'POST' };
       const { id: choiceId } = choices[vote];
-      const response = await fetch(`/v1/choices/${choiceId}`, opts);
+      const response = await fetch(`/v1/polls/${pollId}/choices/${choiceId}`, opts);
       const payload = await response.json();
 
       if (response.ok) {
@@ -112,7 +112,7 @@ class VoteForm extends Component {
             ))}
           </CardSupportingText>
           <CardActions>
-            <CardAction unelevated type="submit">Vote</CardAction>
+            <CardAction raised type="submit">Vote</CardAction>
           </CardActions>
         </Card>
       </form>

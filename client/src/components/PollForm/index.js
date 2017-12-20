@@ -116,7 +116,7 @@ class PollForm extends Component {
               ))}
             </CardSupportingText>
             <CardActions>
-              <CardAction unelevated type="submit">Submit</CardAction>
+              <CardAction raised type="submit">Submit</CardAction>
             </CardActions>
           </Card>
         </form>
