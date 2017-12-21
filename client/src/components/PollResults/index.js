@@ -5,6 +5,7 @@ import CardTitle from 'react-toolbox/lib/card/CardTitle';
 
 import './style.css';
 
+import ErrorCard from '../ErrorCard';
 import Loading from '../Loading';
 
 class PollResults extends Component {
@@ -30,6 +31,12 @@ class PollResults extends Component {
 
     try {
       const response = await fetch(endpoint);
+
+      if (response.status === 500) {
+        this.setState({ error: 'Something went wrong...', isLoading: false });
+        return;
+      }
+
       const payload = await response.json();
 
       if (response.ok) {
@@ -64,7 +71,9 @@ class PollResults extends Component {
   }
 
   componentWillUnmount() {
-    this.state.ws.close();
+    if (this.state.ws) {
+      this.state.ws.close();
+    }
   }
 
   render() {
@@ -75,6 +84,10 @@ class PollResults extends Component {
 
     if (isLoading) {
       return <Loading className="loading-center" />
+    }
+
+    if (error) {
+      return <ErrorCard message={error} />; 
     }
 
     return (
