@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Toolbar, ToolbarRow, ToolbarTitle } from 'rmwc';
+import AppBar from 'react-toolbox/lib/app_bar/AppBar';
+import Button from 'react-toolbox/lib/button/Button';
+import Link from 'react-toolbox/lib/link/Link';
+import Navigation from 'react-toolbox/lib/navigation/Navigation';
 
 import './style.css';
 
 class Navbar extends Component {
   render() {
     return (
-      <Toolbar>
-        <ToolbarRow>
-          <ToolbarTitle><Link className="home-link" to="/">Quick Poll</Link></ToolbarTitle>
-        </ToolbarRow>
-      </Toolbar>
+      <AppBar title="Quick Poll" />
     );
   }
 }

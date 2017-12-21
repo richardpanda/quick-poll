@@ -1,15 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import 'material-components-web/dist/material-components-web.css';
+import ThemeProvider from 'react-toolbox/lib/ThemeProvider';
+
+import './toolbox/theme.css';
 
 import App from './App';
+import theme from './toolbox/theme.js';
 import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
+  <ThemeProvider theme={theme}>
+    <BrowserRouter> 
+      <App />
+    </BrowserRouter>
+  </ThemeProvider>,
   document.getElementById('root')
 );
 registerServiceWorker();

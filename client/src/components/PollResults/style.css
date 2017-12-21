@@ -4,7 +4,7 @@
 }
 
 .poll-results-bar {
-    background-color: var(--mdc-theme-secondary-light);
+    background-color: rgb(244, 143, 177);
 }
 
 .poll-results-percent {

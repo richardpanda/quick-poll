@@ -3,10 +3,6 @@
     max-width: 600px;
 }
 
-.poll-form-error {
-    color: red;
-}
-
-.text-field {
-    width: 100%;
+.poll-form-checkbox {
+    margin-bottom: 0px;
 }

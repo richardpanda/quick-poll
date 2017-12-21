@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card,
-  CardAction,
-  CardActions,
-  CardPrimary,
-  CardSubtitle,
-  CardSupportingText,
-  CardTitle,
-  LinearProgress,
-  Radio,
-} from 'rmwc';
+import Button from 'react-toolbox/lib/button/Button';
+import Card from 'react-toolbox/lib/card/Card';
+import CardActions from 'react-toolbox/lib/card/CardActions';
+import CardText from 'react-toolbox/lib/card/CardText';
+import CardTitle from 'react-toolbox/lib/card/CardTitle';
+import RadioButton from 'react-toolbox/lib/radio/RadioButton';
+import RadioGroup from 'react-toolbox/lib/radio/RadioGroup';
 
 import './style.css';
+
+import Loading from '../Loading';
 
 class VoteForm extends Component {
   constructor(props) {
@@ -48,10 +46,7 @@ class VoteForm extends Component {
   }
 
   handleRadioChange(index) {
-    const self = this;
-    return function(event) {
-      self.setState({ vote: index });
-    };
+    this.setState({ vote: index });
   }
 
   async handleSubmit(event) {
@@ -89,47 +84,27 @@ class VoteForm extends Component {
     const { choices, error, isLoading, question, vote } = this.state;
 
     if (isLoading) {
-      return <LinearProgress className="loading" determinate={false} />;
+      return (
+        <Loading className="loading-center" />
+      );
     }
 
     return (
       <form onSubmit={this.handleSubmit}>
         <Card className="vote-form">
-          <CardPrimary className="vote-form-title">
-            <CardTitle large>{question}</CardTitle>
-            <CardSubtitle className="vote-form-error">
-              {error}
-            </CardSubtitle>
-          </CardPrimary>
-          <CardSupportingText>
-            {choices.map((choice, i) => (
-              <div key={choice.id}>
-                <Radio
-                  name="radio"
-                  checked={vote === i}
-                  onChange={this.handleRadioChange(i)}
-                >
-                  {choice.text}
-                </Radio>
-              </div>
-            ))}
-          </CardSupportingText>
-          <CardActions>
-            <CardAction raised type="submit">Vote</CardAction>
+          <CardTitle title={question} subtitle={error} />
+          <CardText className="vote-form-radio-group">
+            <RadioGroup name="vote" value={vote.toString()} onChange={this.handleRadioChange}>
+              {choices.map((choice, i) => (
+                <RadioButton key={choice.id} label={choice.text} value={i.toString()} />
+              ))}
+            </RadioGroup>
+          </CardText>
+          <CardActions className="vote-form-submit-button">
+            <Button type="submit" label="Vote" primary raised />
             <Link to={`/polls/${id}/results`}>
-              <CardAction
-                raised
-                theme={['secondary-bg', 'text-primary-on-secondary']}
-              >
-                Results
-              </CardAction>
+              <Button label="Results" accent raised />
             </Link>
-            {/* <CardAction
-              raised
-              theme={['secondary-bg', 'text-primary-on-secondary']}
-            >
-              Results
-            </CardAction> */}
           </CardActions>
         </Card>
       </form>

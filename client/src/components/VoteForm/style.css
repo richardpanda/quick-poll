@@ -3,6 +3,14 @@
     max-width: 600px;
 }
 
+.vote-form-radio-group {
+    padding-bottom: 0px;
+}
+
 .vote-form-error {
     color: red;
+}
+
+.vote-form-submit-button {
+    padding-top: 0px;
 }

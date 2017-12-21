@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
-import {
-  Card,
-  CardAction,
-  CardActions,
-  CardPrimary,
-  CardSubtitle,
-  CardSupportingText,
-  CardTitle,
-  Checkbox,
-  LinearProgress,
-  TextField,
-} from 'rmwc';
+import Button from 'react-toolbox/lib/button/Button';
+import Card from 'react-toolbox/lib/card/Card';
+import CardActions from 'react-toolbox/lib/card/CardActions';
+import CardText from 'react-toolbox/lib/card/CardText';
+import CardTitle from 'react-toolbox/lib/card/CardTitle';
+import Checkbox from 'react-toolbox/lib/checkbox/Checkbox';
+import Input from 'react-toolbox/lib/input/Input';
 
 import './style.css';
+
+import Loading from '../Loading';
 
 class PollForm extends Component {
   constructor(props) {
@@ -32,8 +29,7 @@ class PollForm extends Component {
 
   handleChoiceChange(index) {
     const self = this;
-    return function({ target }) {
-      const { value } = target;
+    return function(value) {
       const { choices } = self.state;
       const nextChoices = [...choices];
 
@@ -46,9 +42,9 @@ class PollForm extends Component {
     };
   }
 
-  handleQuestionChange({ target }) {
-    const { value } = target;
-    this.setState({ question: value });
+  handleQuestionChange(value, { target }) {
+    const { name } = target;
+    this.setState({ [name]: value });
   }
 
   async handleSubmit(event) {
@@ -89,43 +85,47 @@ class PollForm extends Component {
   }
 
   render() {
-    const { choices, error, isLoading } = this.state;
+    const { checkIP, choices, error, isLoading, question } = this.state;
 
     return (
       <div>
-        {isLoading
-          && <LinearProgress className="loading" determinate={false} />
-        }
         <form onSubmit={this.handleSubmit}>
           <Card className="poll-form">
-            <CardPrimary>
-              <CardTitle large>Create a Poll</CardTitle>
-              <CardSubtitle className="poll-form-error">
-                {error}
-              </CardSubtitle>
-            </CardPrimary>
-            <CardSupportingText>
-              <div>
-                <TextField
-                  className="text-field"
-                  label="Question"
-                  onChange={this.handleQuestionChange}
-                  required
-                />
-              </div>
+            <CardTitle
+              title="Create a Poll"
+              subtitle={error}
+            />
+            <CardText>
+              <Input
+                type="text"
+                label="Question"
+                name="question"
+                value={question}
+                onChange={this.handleQuestionChange}
+                required
+              />
               {choices.map((choice, i) => (
                 <div key={i}>
-                  <TextField
-                    className="text-field"
+                  <Input
+                    type="text"
+                    value={choice}
                     label="Choice"
                     onChange={this.handleChoiceChange(i)}
                   />
                 </div>
               ))}
-              <Checkbox onClick={this.handleCheckIPClick}>IP Duplication Checking</Checkbox>
-            </CardSupportingText>
+              <Checkbox
+                className="poll-form-checkbox"
+                label="IP Duplication Checking"
+                checked={checkIP}
+                onChange={this.handleCheckIPClick}
+              />
+            </CardText>
             <CardActions>
-              <CardAction raised type="submit">Submit</CardAction>
+              {isLoading
+                ? <Loading />
+                : <Button type="submit" label="Submit" primary raised />
+              }
             </CardActions>
           </Card>
         </form>

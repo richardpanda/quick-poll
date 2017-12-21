@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import {
-  Card,
-  CardPrimary,
-  CardSubtitle,
-  CardSupportingText,
-  CardTitle,
-  LinearProgress,
-} from 'rmwc';
+import Card from 'react-toolbox/lib/card/Card';
+import CardText from 'react-toolbox/lib/card/CardText';
+import CardTitle from 'react-toolbox/lib/card/CardTitle';
 
 import './style.css';
+
+import Loading from '../Loading';
 
 class PollResults extends Component {
   constructor(props) {
@@ -77,21 +74,16 @@ class PollResults extends Component {
     sortedChoices.sort((c1, c2) => c2.num_votes - c1.num_votes);
 
     if (isLoading) {
-      return <LinearProgress className="loading" determinate={false} />;
+      return <Loading className="loading-center" />
     }
 
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
           <Card className="poll-results">
-            <CardPrimary>
-              <CardTitle large>{question}</CardTitle>
-              <CardSubtitle className="poll-results-error">
-                {error}
-              </CardSubtitle>
-            </CardPrimary>
+            <CardTitle title={question} />
             {sortedChoices.map(({ id, num_votes, text }) => (
-              <CardSupportingText key={id}>
+              <CardText key={id}>
                 <div className="poll-results-row">
                   <div>{text}</div>
                   {num_votes === 1
@@ -103,7 +95,7 @@ class PollResults extends Component {
                   <div className="poll-results-bar" style={{ width: `${num_votes / sum * 100}%` }} />
                   <div className="poll-results-percent">{Math.round(num_votes / sum * 100)}%</div>
                 </div>
-              </CardSupportingText>
+              </CardText>
             ))}
           </Card>
         </form>
