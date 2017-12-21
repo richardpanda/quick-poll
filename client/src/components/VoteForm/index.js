@@ -4,13 +4,13 @@ import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardActions from 'react-toolbox/lib/card/CardActions';
 import CardText from 'react-toolbox/lib/card/CardText';
-import CardTitle from 'react-toolbox/lib/card/CardTitle';
 import RadioButton from 'react-toolbox/lib/radio/RadioButton';
 import RadioGroup from 'react-toolbox/lib/radio/RadioGroup';
 
 import './style.css';
 
 import ErrorCard from '../ErrorCard';
+import FormTitle from '../FormTitle';
 import Loading from '../Loading';
 
 class VoteForm extends Component {
@@ -115,7 +115,7 @@ class VoteForm extends Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <Card className="vote-form">
-          <CardTitle title={question} subtitle={vote.error} />
+          <FormTitle title={question} subtitle={vote.error} />
           <CardText className="vote-form-radio-group">
             <RadioGroup name="vote" value={vote.index.toString()} onChange={this.handleRadioChange}>
               {choices.map((choice, i) => (

@@ -3,12 +3,12 @@ import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardActions from 'react-toolbox/lib/card/CardActions';
 import CardText from 'react-toolbox/lib/card/CardText';
-import CardTitle from 'react-toolbox/lib/card/CardTitle';
 import Checkbox from 'react-toolbox/lib/checkbox/Checkbox';
 import Input from 'react-toolbox/lib/input/Input';
 
 import './style.css';
 
+import FormTitle from '../FormTitle';
 import Loading from '../Loading';
 
 class PollForm extends Component {
@@ -91,7 +91,7 @@ class PollForm extends Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <Card className="poll-form">
-            <CardTitle
+            <FormTitle
               title="Create a Poll"
               subtitle={error}
             />
