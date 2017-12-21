@@ -93,7 +93,9 @@ class PollResults extends Component {
                 </div>
                 <div className="poll-results-row">
                   <div className="poll-results-bar" style={{ width: `${num_votes / sum * 100}%` }} />
-                  <div className="poll-results-percent">{Math.round(num_votes / sum * 100)}%</div>
+                  <div className="poll-results-percent">
+                    {sum === 0 ? 0 : Math.round(num_votes / sum * 100)}%
+                  </div>
                 </div>
               </CardText>
             ))}
