@@ -10,6 +10,7 @@ import RadioGroup from 'react-toolbox/lib/radio/RadioGroup';
 
 import './style.css';
 
+import ErrorCard from '../ErrorCard';
 import Loading from '../Loading';
 
 class VoteForm extends Component {
@@ -17,10 +18,16 @@ class VoteForm extends Component {
     super(props);
     this.state = {
       choices: [],
-      error: '',
-      isLoading: true,
+      poll: {
+        error: '',
+        isFetching: false,
+      },
       question: '',
-      vote: -1,
+      vote: {
+        error: '',
+        index: -1,
+        isFetching: false,
+      },
     };
     this.handleRadioChange = this.handleRadioChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -29,24 +36,31 @@ class VoteForm extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     const endpoint = `/v1/polls/${id}`;
+    this.setState({ poll: { isFetching: true, error: '' }});
 
     try {
       const response = await fetch(endpoint);
+
+      if (response.status === 500) {
+        this.setState({ poll: { error: 'Something went wrong...', isFetching: false }});
+        return;
+      }
+
       const payload = await response.json();
 
       if (response.ok) {
         const { choices, question } = payload;
-        this.setState({ choices, isLoading: false, question });
+        this.setState({ choices, poll: { error: '', isFetching: false }, question });
       } else {
-        this.setState({ error: payload.message, isloading: false });
+        this.setState({ poll: { error: payload.message, isFetching: false }});
       }
     } catch (e) {
-      this.setState({ error: e, isLoading: false });
+      this.setState({ poll: { error: e, isFetching: false }});
     }
   }
 
   handleRadioChange(index) {
-    this.setState({ vote: index });
+    this.setState({ vote: { ...this.state.vote, index } });
   }
 
   async handleSubmit(event) {
@@ -55,56 +69,71 @@ class VoteForm extends Component {
     const { history, match } = this.props;
     const { choices, vote } = this.state;
     const { id: pollId } = match.params;
-    if (vote === -1) {
-      this.setState({ error: 'Please select a choice.' });
+    if (vote.index === -1) {
+      this.setState({ vote: { ...this.state.vote, error: 'Please select a choice.' }});
       return;
     }
-    this.setState({ error: '', isLoading: true });
+    this.setState({ vote: { ...this.state.vote, error: '', isFetching: true }});
 
     try {
       const opts = { method: 'POST' };
-      const { id: choiceId } = choices[vote];
+      const { id: choiceId } = choices[vote.index];
       const response = await fetch(`/v1/polls/${pollId}/choices/${choiceId}`, opts);
+
+      if (response.status === 500) {
+        this.setState({ vote: { ...this.state.vote, error: 'Something went wrong...' }});
+        return
+      }
+
       const payload = await response.json();
 
       if (response.ok) {
-        this.setState({ isLoading: false });
         history.push(`/polls/${pollId}/results`);
       } else {
-        this.setState({ error: payload.message, isLoading: false });
+        this.setState({ vote: { ...this.state.vote, error: payload.message, isFetching: false }});
       }
     } catch (e) {
-      this.setState({ error: e, isLoading: false });
+      this.setState({ vote: { ...this.state.vote, error: e, isFetching: false }});
     }
   }
 
   render() {
     const { match } = this.props;
     const { id } = match.params;
-    const { choices, error, isLoading, question, vote } = this.state;
+    const { choices, poll, question, vote } = this.state;
 
-    if (isLoading) {
+    if (poll.isFetching) {
       return (
         <Loading className="loading-center" />
       );
     }
 
+    if (poll.error) {
+      return <ErrorCard message="Something went wrong..." />;
+    }
+
     return (
       <form onSubmit={this.handleSubmit}>
         <Card className="vote-form">
-          <CardTitle title={question} subtitle={error} />
+          <CardTitle title={question} subtitle={vote.error} />
           <CardText className="vote-form-radio-group">
-            <RadioGroup name="vote" value={vote.toString()} onChange={this.handleRadioChange}>
+            <RadioGroup name="vote" value={vote.index.toString()} onChange={this.handleRadioChange}>
               {choices.map((choice, i) => (
                 <RadioButton key={choice.id} label={choice.text} value={i.toString()} />
               ))}
             </RadioGroup>
           </CardText>
           <CardActions className="vote-form-submit-button">
-            <Button type="submit" label="Vote" primary raised />
-            <Link to={`/polls/${id}/results`}>
-              <Button label="Results" accent raised />
-            </Link>
+            {vote.isFetching
+              ? <Loading />
+              : (
+                <div>
+                  <Button type="submit" label="Vote" primary raised />
+                  <Link to={`/polls/${id}/results`}>
+                    <Button label="Results" accent raised />
+                  </Link>
+                </div>
+              )}
           </CardActions>
         </Card>
       </form>
