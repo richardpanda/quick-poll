@@ -4,14 +4,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/richardpanda/quick-poll/server/pkg/postgres"
-	"github.com/richardpanda/quick-poll/server/pkg/vote"
-	"github.com/richardpanda/quick-poll/server/pkg/ws"
-
 	_ "github.com/lib/pq"
-	"github.com/richardpanda/quick-poll/server/pkg/choice"
-	"github.com/richardpanda/quick-poll/server/pkg/poll"
-	"github.com/richardpanda/quick-poll/server/pkg/router"
+	"github.com/richardpanda/quick-poll/server/choice"
+	"github.com/richardpanda/quick-poll/server/poll"
+	"github.com/richardpanda/quick-poll/server/postgres"
+	"github.com/richardpanda/quick-poll/server/router"
+	"github.com/richardpanda/quick-poll/server/vote"
+	"github.com/richardpanda/quick-poll/server/ws"
 )
 
 func main() {

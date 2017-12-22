@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"github.com/gorilla/websocket"
-	"github.com/richardpanda/quick-poll/server/pkg/choice"
-	"github.com/richardpanda/quick-poll/server/pkg/httperror"
-	"github.com/richardpanda/quick-poll/server/pkg/poll"
-	"github.com/richardpanda/quick-poll/server/pkg/postgres"
-	. "github.com/richardpanda/quick-poll/server/pkg/router"
-	"github.com/richardpanda/quick-poll/server/pkg/ws"
+	"github.com/richardpanda/quick-poll/server/choice"
+	"github.com/richardpanda/quick-poll/server/httperror"
+	"github.com/richardpanda/quick-poll/server/poll"
+	"github.com/richardpanda/quick-poll/server/postgres"
+	. "github.com/richardpanda/quick-poll/server/router"
+	"github.com/richardpanda/quick-poll/server/ws"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

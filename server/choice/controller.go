@@ -3,8 +3,8 @@ package choice
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/richardpanda/quick-poll/server/pkg/vote"
-	"github.com/richardpanda/quick-poll/server/pkg/ws"
+	"github.com/richardpanda/quick-poll/server/vote"
+	"github.com/richardpanda/quick-poll/server/ws"
 	uuid "github.com/satori/go.uuid"
 )
 

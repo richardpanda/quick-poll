@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/richardpanda/quick-poll/server/pkg/poll"
-	"github.com/richardpanda/quick-poll/server/pkg/vote"
+	"github.com/richardpanda/quick-poll/server/poll"
+	"github.com/richardpanda/quick-poll/server/vote"
 )
 
 func CheckDuplicateVote() gin.HandlerFunc {

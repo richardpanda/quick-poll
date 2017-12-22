@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/richardpanda/quick-poll/server/pkg/choice"
-	"github.com/richardpanda/quick-poll/server/pkg/vote"
+	"github.com/richardpanda/quick-poll/server/choice"
+	"github.com/richardpanda/quick-poll/server/vote"
 )
 
 type Poll struct {

@@ -3,10 +3,10 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/richardpanda/quick-poll/server/pkg/choice"
-	"github.com/richardpanda/quick-poll/server/pkg/middleware"
-	"github.com/richardpanda/quick-poll/server/pkg/poll"
-	"github.com/richardpanda/quick-poll/server/pkg/ws"
+	"github.com/richardpanda/quick-poll/server/choice"
+	"github.com/richardpanda/quick-poll/server/middleware"
+	"github.com/richardpanda/quick-poll/server/poll"
+	"github.com/richardpanda/quick-poll/server/ws"
 )
 
 func New(db *gorm.DB, conn *ws.Conn) *gin.Engine {
