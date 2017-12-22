@@ -46,7 +46,13 @@ class PollResults extends Component {
         ), {});
         const allIds = choices.map(choice => choice.id);
 
-        const ws = new WebSocket(`ws://localhost:8080/v1/polls/${id}/ws`);
+        let ws = null;
+        if (process.env.NODE_ENV === "production") {
+          ws = new WebSocket(`ws://${window.location.hostname}/v1/polls/${id}/ws`);
+        } else {
+          ws = new WebSocket(`ws://localhost:8080/v1/polls/${id}/ws`);
+        }
+
         ws.onmessage = ({ data }) => {
           const { id, num_votes } = JSON.parse(data);
           const { choices } = this.state;
@@ -63,7 +69,7 @@ class PollResults extends Component {
           ws,
         });
       } else {
-        this.setState({ error: payload.message, isloading: false });
+        this.setState({ error: payload.message, isLoading: false });
       }
     } catch (e) {
       this.setState({ error: e, isLoading: false });
