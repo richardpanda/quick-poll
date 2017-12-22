@@ -17,9 +17,11 @@ import (
 
 func main() {
 	var (
-		username         = os.Getenv("DB_USERNAME")
-		name             = os.Getenv("DB_NAME")
-		connectionString = fmt.Sprintf("user=%s dbname=%s sslmode=disable", username, name)
+		host             = os.Getenv("POSTGRES_HOST")
+		user             = os.Getenv("POSTGRES_USER")
+		password         = os.Getenv("POSTGRES_PASSWORD")
+		dbName           = os.Getenv("POSTGRES_DB")
+		connectionString = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbName)
 		conn             = ws.NewConn()
 	)
 

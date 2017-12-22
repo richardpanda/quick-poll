@@ -26,9 +26,10 @@ func CreateVotesTable(db *gorm.DB) {
 
 func DBConnection(t *testing.T) (*gorm.DB, func()) {
 	var (
-		username         = os.Getenv("DB_USERNAME")
-		name             = os.Getenv("TEST_DB_NAME")
-		connectionString = fmt.Sprintf("user=%s dbname=%s sslmode=disable", username, name)
+		user             = os.Getenv("POSTGRES_USER")
+		password         = os.Getenv("POSTGRES_PASSWORD")
+		dbName           = os.Getenv("POSTGRES_TEST_DB")
+		connectionString = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, password, dbName)
 	)
 
 	db, err := gorm.Open("postgres", connectionString)
