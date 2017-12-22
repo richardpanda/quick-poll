@@ -39,20 +39,19 @@ func Create(c *gin.Context) {
 		choices[i] = choice.New(text)
 	}
 
-	poll := Poll{
+	p := Poll{
 		ID:       uuid.NewV4().String(),
 		Question: requestBody.Question,
 		Choices:  choices,
 		CheckIP:  requestBody.CheckIP,
 	}
-	newDB := db.Create(&poll)
-	if newDB.Error != nil {
-		c.JSON(400, gin.H{"message": newDB.Error})
+	if err := db.Create(&p).Error; err != nil {
+		c.JSON(400, gin.H{"message": err})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"id":       poll.ID,
+		"id":       p.ID,
 		"question": requestBody.Question,
 		"choices":  choices,
 		"check_ip": requestBody.CheckIP,
@@ -65,16 +64,16 @@ func orderChoicesCreatedAt(db *gorm.DB) *gorm.DB {
 
 func ReadOne(c *gin.Context) {
 	var (
-		db   = c.MustGet("db").(*gorm.DB)
-		id   = c.Params.ByName("id")
-		poll = Poll{ID: id}
+		db = c.MustGet("db").(*gorm.DB)
+		id = c.Params.ByName("id")
+		p  = Poll{ID: id}
 	)
 
-	err := db.Preload("Choices", orderChoicesCreatedAt).Find(&poll).Error
+	err := db.Preload("Choices", orderChoicesCreatedAt).Find(&p).Error
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Invalid poll ID."})
 		return
 	}
 
-	c.JSON(200, poll)
+	c.JSON(200, p)
 }
