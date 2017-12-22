@@ -35,6 +35,9 @@ func OpenConnection(wsConn *Conn) func(*gin.Context) {
 			_, _, err := conn.ReadMessage()
 			if err != nil {
 				delete(wsConn.Table[id], addrString)
+				if len(wsConn.Table[id]) == 0 {
+					delete(wsConn.Table, id)
+				}
 				if flag.Lookup("test.v") != nil {
 					wsConn.Done <- true
 				}

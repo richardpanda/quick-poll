@@ -55,10 +55,9 @@ func TestGetWS(t *testing.T) {
 
 	conn.Close()
 	<-wsConn.Done
-	assert.Equal(t, 1, len(wsConn.Table))
-	clients, ok = wsConn.Table[p.ID]
-	assert.True(t, ok)
-	assert.Equal(t, 0, len(clients))
+	assert.Equal(t, 0, len(wsConn.Table))
+	_, ok = wsConn.Table[p.ID]
+	assert.False(t, ok)
 }
 
 func TestGetWSWithInvalidPollID(t *testing.T) {
