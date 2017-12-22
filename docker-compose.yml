@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: library/postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=quick_poll_prod
+  server:
+    build: ./server
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=quick_poll_prod
+    command: sh -c "./wait-for-it.sh db:5432 -- go-wrapper run main.go"
+    depends_on:
+      - db
+  client:
+    build: "./client"
+  web:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+      - client
