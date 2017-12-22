@@ -1,6 +1,10 @@
 package vote
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Vote struct {
 	ID        string     `json:"id" sql:"type:uuid;primary_key"`
@@ -9,4 +13,12 @@ type Vote struct {
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-"`
+}
+
+func CreateTable(db *gorm.DB) {
+	db.CreateTable(&Vote{})
+}
+
+func DropTable(db *gorm.DB) {
+	db.DropTableIfExists("votes")
 }

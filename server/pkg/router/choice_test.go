@@ -13,22 +13,23 @@ import (
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
 	"github.com/richardpanda/quick-poll/server/pkg/poll"
+	"github.com/richardpanda/quick-poll/server/pkg/postgres"
 	. "github.com/richardpanda/quick-poll/server/pkg/router"
-	"github.com/richardpanda/quick-poll/server/pkg/test"
+	"github.com/richardpanda/quick-poll/server/pkg/vote"
 	"github.com/richardpanda/quick-poll/server/pkg/ws"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPostChoice(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	test.CreateVotesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
-	defer test.DropVotesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	vote.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
+	defer vote.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -39,14 +40,12 @@ func TestPostChoice(t *testing.T) {
 			choice.New("yellow"),
 		},
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
 	choiceID := p.Choices[0].ID
 	router := NewTestRouter(db, ws.NewConn())
 	server := httptest.NewServer(router)
-
 	wsURL := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(wsURL, nil)
@@ -64,8 +63,8 @@ func TestPostChoice(t *testing.T) {
 
 	cu := ws.ChoiceUpdate{}
 	err = conn.ReadJSON(&cu)
-	assert.NoError(t, err)
 
+	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, choiceID, responseBody.ID)
 	assert.Equal(t, "blue", responseBody.Text)
@@ -75,14 +74,14 @@ func TestPostChoice(t *testing.T) {
 }
 
 func TestPostChoiceTwiceToSamePoll(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	test.CreateVotesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
-	defer test.DropVotesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	vote.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
+	defer vote.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -94,7 +93,6 @@ func TestPostChoiceTwiceToSamePoll(t *testing.T) {
 		},
 		CheckIP: true,
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
@@ -102,7 +100,6 @@ func TestPostChoiceTwiceToSamePoll(t *testing.T) {
 	secondChoiceID := p.Choices[1].ID
 	router := NewTestRouter(db, ws.NewConn())
 	server := httptest.NewServer(router)
-
 	wsURL := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(wsURL, nil)
@@ -121,7 +118,6 @@ func TestPostChoiceTwiceToSamePoll(t *testing.T) {
 	cu := ws.ChoiceUpdate{}
 	err = conn.ReadJSON(&cu)
 	assert.NoError(t, err)
-
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, firstChoiceID, responseBody.ID)
 	assert.Equal(t, "blue", responseBody.Text)
@@ -143,14 +139,14 @@ func TestPostChoiceTwiceToSamePoll(t *testing.T) {
 }
 
 func TestPostChoiceWithInvalidID(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	test.CreateVotesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
-	defer test.DropVotesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	vote.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
+	defer vote.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -161,7 +157,6 @@ func TestPostChoiceWithInvalidID(t *testing.T) {
 			choice.New("yellow"),
 		},
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 

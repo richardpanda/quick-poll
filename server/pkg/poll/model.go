@@ -3,6 +3,7 @@ package poll
 import (
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/vote"
 )
@@ -36,4 +37,12 @@ type PostPollsResponseBody struct {
 	Question string          `json:"question"`
 	Choices  []choice.Choice `json:"choices"`
 	CheckIP  bool            `json:"check_ip"`
+}
+
+func CreateTable(db *gorm.DB) {
+	db.CreateTable(&Poll{})
+}
+
+func DropTable(db *gorm.DB) {
+	db.DropTableIfExists("poll")
 }

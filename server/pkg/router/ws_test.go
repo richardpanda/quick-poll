@@ -11,20 +11,20 @@ import (
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
 	"github.com/richardpanda/quick-poll/server/pkg/poll"
+	"github.com/richardpanda/quick-poll/server/pkg/postgres"
 	. "github.com/richardpanda/quick-poll/server/pkg/router"
-	"github.com/richardpanda/quick-poll/server/pkg/test"
 	"github.com/richardpanda/quick-poll/server/pkg/ws"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetWS(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -35,7 +35,6 @@ func TestGetWS(t *testing.T) {
 			choice.New("yellow"),
 		},
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
@@ -46,7 +45,6 @@ func TestGetWS(t *testing.T) {
 	url := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
 	fmt.Println(url)
 	d := websocket.DefaultDialer
-
 	conn, _, err := d.Dial(url, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(wsConn.Table))
@@ -57,17 +55,15 @@ func TestGetWS(t *testing.T) {
 
 	conn.Close()
 	<-wsConn.Done
-
 	assert.Equal(t, 1, len(wsConn.Table))
-
 	clients, ok = wsConn.Table[p.ID]
 	assert.True(t, ok)
 	assert.Equal(t, 0, len(clients))
 }
 
 func TestGetWSWithInvalidPollID(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
+	db := postgres.ConnectTest(t)
+	defer db.Close()
 
 	wsConn := ws.NewConn()
 	server := httptest.NewServer(NewTestRouter(db, wsConn))
@@ -76,9 +72,7 @@ func TestGetWSWithInvalidPollID(t *testing.T) {
 	invalidPollID := uuid.NewV4().String()
 	url := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), invalidPollID)
 	d := websocket.DefaultDialer
-
 	conn, resp, err := d.Dial(url, nil)
-
 	assert.Nil(t, conn)
 	assert.Error(t, err)
 

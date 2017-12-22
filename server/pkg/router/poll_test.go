@@ -8,25 +8,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/richardpanda/quick-poll/server/pkg/ws"
-
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/richardpanda/quick-poll/server/pkg/choice"
 	"github.com/richardpanda/quick-poll/server/pkg/httperror"
 	"github.com/richardpanda/quick-poll/server/pkg/poll"
+	"github.com/richardpanda/quick-poll/server/pkg/postgres"
 	. "github.com/richardpanda/quick-poll/server/pkg/router"
-	"github.com/richardpanda/quick-poll/server/pkg/test"
+	"github.com/richardpanda/quick-poll/server/pkg/ws"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetPoll(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -37,7 +36,6 @@ func TestGetPoll(t *testing.T) {
 			choice.New("yellow"),
 		},
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
@@ -64,12 +62,12 @@ func TestGetPoll(t *testing.T) {
 }
 
 func TestGetPollWithInvalidID(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
 
 	p := poll.Poll{
 		ID:       uuid.NewV4().String(),
@@ -81,7 +79,6 @@ func TestGetPollWithInvalidID(t *testing.T) {
 		},
 		CheckIP: true,
 	}
-
 	err := db.Create(&p).Error
 	assert.NoError(t, err)
 
@@ -103,12 +100,12 @@ func TestGetPollWithInvalidID(t *testing.T) {
 }
 
 func TestPostPolls(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
-	test.CreatePollsTable(db)
-	test.CreateChoicesTable(db)
-	defer test.DropPollsTable(db)
-	defer test.DropChoicesTable(db)
+	db := postgres.ConnectTest(t)
+	defer db.Close()
+	poll.CreateTable(db)
+	choice.CreateTable(db)
+	defer poll.DropTable(db)
+	defer choice.DropTable(db)
 
 	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
@@ -139,8 +136,8 @@ func TestPostPolls(t *testing.T) {
 }
 
 func TestPostPollsWithoutRequestBody(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
+	db := postgres.ConnectTest(t)
+	defer db.Close()
 
 	router := NewTestRouter(db, ws.NewConn())
 	req, err := http.NewRequest("POST", "/v1/polls", nil)
@@ -158,8 +155,8 @@ func TestPostPollsWithoutRequestBody(t *testing.T) {
 }
 
 func TestPostPollsWithoutQuestion(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
+	db := postgres.ConnectTest(t)
+	defer db.Close()
 
 	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Choices: []string{"blue", "red", "yellow"},
@@ -182,8 +179,8 @@ func TestPostPollsWithoutQuestion(t *testing.T) {
 }
 
 func TestPostPollsWithoutChoices(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
+	db := postgres.ConnectTest(t)
+	defer db.Close()
 
 	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
@@ -206,8 +203,8 @@ func TestPostPollsWithoutChoices(t *testing.T) {
 }
 
 func TestPostPollsWithOneChoice(t *testing.T) {
-	db, close := test.DBConnection(t)
-	defer close()
+	db := postgres.ConnectTest(t)
+	defer db.Close()
 
 	b, err := json.Marshal(poll.PostPollsRequestBody{
 		Question: "Favorite color?",
