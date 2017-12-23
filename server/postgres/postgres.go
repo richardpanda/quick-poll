@@ -9,7 +9,13 @@ import (
 )
 
 func Connect(host, user, password, dbName string) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbName)
+	var connectionString string
+	if password == "" {
+		connectionString = fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable", host, user, dbName)
+	} else {
+		connectionString = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbName)
+	}
+
 	db, err := gorm.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
