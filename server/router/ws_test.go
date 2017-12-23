@@ -43,7 +43,6 @@ func TestGetWS(t *testing.T) {
 	defer server.Close()
 
 	url := fmt.Sprintf("ws%s/v1/polls/%s/ws", strings.TrimPrefix(server.URL, "http"), p.ID)
-	fmt.Println(url)
 	d := websocket.DefaultDialer
 	conn, _, err := d.Dial(url, nil)
 	assert.NoError(t, err)
@@ -63,6 +62,8 @@ func TestGetWS(t *testing.T) {
 func TestGetWSWithInvalidPollID(t *testing.T) {
 	db := postgres.ConnectTest(t)
 	defer db.Close()
+	poll.CreateTable(db)
+	defer poll.DropTable(db)
 
 	wsConn := ws.NewConn()
 	server := httptest.NewServer(NewTestRouter(db, wsConn))

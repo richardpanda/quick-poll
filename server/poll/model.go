@@ -44,5 +44,5 @@ func CreateTable(db *gorm.DB) {
 }
 
 func DropTable(db *gorm.DB) {
-	db.DropTableIfExists("poll")
+	db.DropTableIfExists("polls")
 }
