@@ -105,7 +105,7 @@ class VoteForm extends Component {
 
     if (poll.isFetching) {
       return (
-        <Loading className="loading-center" />
+        <Loading center />
       );
     }
 

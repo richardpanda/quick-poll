@@ -94,7 +94,7 @@ class PollResults extends Component {
     sortedChoices.sort((c1, c2) => c2.num_votes - c1.num_votes);
 
     if (isLoading) {
-      return <Loading className="loading-center" />
+      return <Loading center />
     }
 
     if (error) {
