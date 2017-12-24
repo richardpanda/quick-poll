@@ -8,5 +8,7 @@
 }
 
 .vote-form-submit-button {
+    height: 48px;
+    justify-content: space-between;
     padding-top: 0px;
 }

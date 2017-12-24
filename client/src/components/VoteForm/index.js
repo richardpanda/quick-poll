@@ -12,6 +12,7 @@ import './style.css';
 import ErrorCard from '../ErrorCard';
 import FormTitle from '../FormTitle';
 import Loading from '../Loading';
+import Share from '../Share';
 
 class VoteForm extends Component {
   constructor(props) {
@@ -134,6 +135,7 @@ class VoteForm extends Component {
                   </Link>
                 </div>
               )}
+              <Share />
           </CardActions>
         </Card>
       </form>

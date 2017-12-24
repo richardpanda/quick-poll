@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Card from 'react-toolbox/lib/card/Card';
+import CardActions from 'react-toolbox/lib/card/CardActions';
 import CardText from 'react-toolbox/lib/card/CardText';
 import CardTitle from 'react-toolbox/lib/card/CardTitle';
 
@@ -7,6 +8,7 @@ import './style.css';
 
 import ErrorCard from '../ErrorCard';
 import Loading from '../Loading';
+import Share from '../Share';
 
 class PollResults extends Component {
   constructor(props) {
@@ -118,6 +120,9 @@ class PollResults extends Component {
                 </div>
               </CardText>
             ))}
+            <CardActions style={{ flexDirection: "row-reverse", height: "48px" }}>
+              <Share />
+            </CardActions>
           </Card>
         </form>
       </div>
