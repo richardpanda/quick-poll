@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardActions from 'react-toolbox/lib/card/CardActions';
 import CardText from 'react-toolbox/lib/card/CardText';
@@ -85,6 +87,7 @@ class PollResults extends Component {
   }
 
   render() {
+    const { match } = this.props;
     const { choices, error, isLoading, question } = this.state;
     const sum = choices.allIds.reduce((acc, id) => acc + choices.byId[id].num_votes, 0);
     const sortedChoices = choices.allIds.map(id => choices.byId[id]);
@@ -120,7 +123,15 @@ class PollResults extends Component {
                 </div>
               </CardText>
             ))}
-            <CardActions style={{ flexDirection: "row-reverse", height: "48px" }}>
+            <CardActions style={{ height: "48px", justifyContent: "space-between" }}>
+              <div>
+                <Link to={`/polls/${match.params.id}`}>
+                  <Button label="Vote Page" primary raised style={{ marginRight: "4px" }} />
+                </Link>
+                <Link to={`/`}>
+                  <Button label="New Poll" accent raised />
+                </Link>
+              </div>
               <Share />
             </CardActions>
           </Card>
