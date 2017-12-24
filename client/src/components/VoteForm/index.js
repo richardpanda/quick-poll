@@ -14,6 +14,8 @@ import FormTitle from '../FormTitle';
 import Loading from '../Loading';
 import Share from '../Share';
 
+import { fetchGetPoll, fetchPostChoice } from '../../api';
+
 class VoteForm extends Component {
   constructor(props) {
     super(props);
@@ -36,25 +38,10 @@ class VoteForm extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    const endpoint = `/v1/polls/${id}`;
     this.setState({ poll: { isFetching: true, error: '' }});
-
     try {
-      const response = await fetch(endpoint);
-
-      if (response.status === 500) {
-        this.setState({ poll: { error: 'Something went wrong...', isFetching: false }});
-        return;
-      }
-
-      const payload = await response.json();
-
-      if (response.ok) {
-        const { choices, question } = payload;
-        this.setState({ choices, poll: { error: '', isFetching: false }, question });
-      } else {
-        this.setState({ poll: { error: payload.message, isFetching: false }});
-      }
+      const { choices, question } = await fetchGetPoll(id);
+      this.setState({ choices, poll: { error: '', isFetching: false }, question });
     } catch (e) {
       this.setState({ poll: { error: e, isFetching: false }});
     }
@@ -76,25 +63,12 @@ class VoteForm extends Component {
     }
     this.setState({ vote: { ...this.state.vote, error: '', isFetching: true }});
 
+    const { id: choiceId } = choices[vote.index];
     try {
-      const opts = { method: 'POST' };
-      const { id: choiceId } = choices[vote.index];
-      const response = await fetch(`/v1/polls/${pollId}/choices/${choiceId}`, opts);
-
-      if (response.status === 500) {
-        this.setState({ vote: { ...this.state.vote, error: 'Something went wrong...' }});
-        return
-      }
-
-      const payload = await response.json();
-
-      if (response.ok) {
-        history.push(`/polls/${pollId}/results`);
-      } else {
-        this.setState({ vote: { ...this.state.vote, error: payload.message, isFetching: false }});
-      }
+      await fetchPostChoice(pollId, choiceId);
+      history.push(`/polls/${pollId}/results`);
     } catch (e) {
-      this.setState({ vote: { ...this.state.vote, error: e, isFetching: false }});
+      this.setState({ vote: { ...this.state.vote, error: e.message, isFetching: false }});
     }
   }
 
@@ -110,21 +84,21 @@ class VoteForm extends Component {
     }
 
     if (poll.error) {
-      return <ErrorCard message="Something went wrong..." />;
+      return <ErrorCard message={poll.error} />;
     }
 
     return (
       <form onSubmit={this.handleSubmit}>
         <Card className="vote-form">
           <FormTitle title={question} subtitle={vote.error} />
-          <CardText className="vote-form-radio-group">
+          <CardText className="vote-form__radio-group">
             <RadioGroup name="vote" value={vote.index.toString()} onChange={this.handleRadioChange}>
               {choices.map((choice, i) => (
                 <RadioButton key={choice.id} label={choice.text} value={i.toString()} />
               ))}
             </RadioGroup>
           </CardText>
-          <CardActions className="vote-form-submit-button">
+          <CardActions className="vote-form__actions">
             {vote.isFetching
               ? <Loading />
               : (

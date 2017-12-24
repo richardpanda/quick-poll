@@ -11,6 +11,8 @@ import './style.css';
 import FormTitle from '../FormTitle';
 import Loading from '../Loading';
 
+import { fetchPostPoll } from '../../api';
+
 class PollForm extends Component {
   constructor(props) {
     super(props);
@@ -32,8 +34,10 @@ class PollForm extends Component {
     return function(value) {
       const { choices } = self.state;
       const nextChoices = [...choices];
+      const isLastChoice = index === choices.length - 1;
+      const isChoiceEmpty = choices[index] === '';
 
-      if (index === choices.length-1 && choices[index] === '') {
+      if (isLastChoice && isChoiceEmpty) {
         nextChoices.push('');
       }
 
@@ -61,21 +65,11 @@ class PollForm extends Component {
     this.setState({ error: '', isLoading: true });
 
     try {
-      const opts = {
-        method: 'POST',
-        body: JSON.stringify({ question, choices: validChoices, check_ip: checkIP }),
-      };
-      const response = await fetch('/v1/polls', opts);
-      const payload = await response.json();
-
-      if (response.ok) {
-        this.setState({ isLoading: false });
-        history.push(`/polls/${payload.id}`);
-      } else {
-        this.setState({ error: payload.message, isLoading: false });
-      }
+      const { id } = await fetchPostPoll({ question, choices: validChoices, checkIP });
+      this.setState({ isLoading: false });
+      history.push(`/polls/${id}`);
     } catch (e) {
-      this.setState({ error: e, isLoading: false });
+      this.setState({ error: e.message, isLoading: false });
     }
   }
 
@@ -90,7 +84,7 @@ class PollForm extends Component {
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
-          <Card className="poll-form">
+          <Card style={{ margin: "16px auto", maxWidth: "600px" }}>
             <FormTitle
               title="Create a Poll"
               subtitle={error}
@@ -115,7 +109,7 @@ class PollForm extends Component {
                 </div>
               ))}
               <Checkbox
-                className="poll-form-checkbox"
+                className="poll-form__checkbox"
                 label="IP Duplication Checking"
                 checked={checkIP}
                 onChange={this.handleCheckIPClick}

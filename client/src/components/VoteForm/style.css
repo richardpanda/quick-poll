@@ -3,12 +3,12 @@
     max-width: 600px;
 }
 
-.vote-form-radio-group {
-    padding-bottom: 0px;
-}
-
-.vote-form-submit-button {
+.vote-form__actions {
     height: 48px;
     justify-content: space-between;
     padding-top: 0px;
+}
+
+.vote-form__radio-group {
+    padding-bottom: 0px;
 }
